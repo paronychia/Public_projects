@@ -1,0 +1,187 @@
+Задача:
+Вы разработчик в компании, занимающейся созданием веб-сервисов для онлайн-магазина. Ваша задача — создать и задокументировать API для управления товарами и заказами с использованием Swagger (OpenAPI).
+
+Требования:
+Создать API для управления товарами:
+
+Получить список всех товаров.
+Получить информацию о конкретном товаре по его ID.
+Добавить новый товар.
+Обновить информацию о существующем товаре.
+Удалить товар.
+
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: Онлайн-магазин продуктов
+servers:
+  - url: http://localhost:8000/api/v1/
+    description: Dev server 
+paths:
+  /goods:
+    get:
+      summary: Метод получения списка товаров
+      tags:
+        - Goods
+      operationId: getAllGoods
+      responses:
+        '200':
+          description: Успешный ответ со списком всех товаров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goods'
+        'default':
+          description: Всё нестандартное
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Метод добавления нового товара
+      tags:
+        - Goods
+      operationId: createGood
+      requestBody: 
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/Good' 
+      responses:
+        '200':
+          description: Успешный ответ с добавленным товаром
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Good'
+        'default':
+          description: Всё нестандартное
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+                      
+  /goods/{good_id}: 
+    get:
+      summary: Метод получения товара по идентификатору
+      tags:
+        - Goods
+      operationId: getGoodById
+      parameters: 
+        - name: good_id
+          in: path
+          required: true
+          description: Идентификатор товара
+          schema:
+            type: string
+            example: 42abcd2b-8b9c-4af9-88f7-0bc180cf74b4          
+      responses:
+        '200':
+          description: Успешный ответ с одним товаром
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Good'
+        'default':
+          description: Всё нестандартное
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+    delete: 
+      summary: Метод удаления товара по идентификатору
+      tags:
+        - Goods
+      operationId: deleteGoodById
+      parameters:
+        - name: good_id
+          in: path
+          required: true
+          description: Идентификатор товара
+          schema:
+            type: string
+            example: 42abcd2b-8b9c-4af9-88f7-0bc180cf74b4
+      responses:
+        '200':
+          description: Успешное удаление
+          content:
+            application/json: {}
+        'default':
+          description: Всё нестандартное
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Метод обновления информации о товаре по идентификатору
+      tags:
+        - Goods
+      operationId: updateGoodById
+      parameters:
+        - name: good_id
+          in: path
+          required: true
+          description: Идентификатор товара
+          schema:
+            type: string
+            example: 42abcd2b-8b9c-4af9-88f7-0bc180cf74b4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Good'
+      responses:
+        '200':
+          description: Успешное обновление информации
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Good'
+        'default':
+          description: Всё нестандартное
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+
+components: 
+  schemas: 
+    Good:
+      type: object
+      required:
+        - name
+        - status
+      properties:
+        good_id:
+          type: string
+          example: 42abcd2b-8b9c-4af9-88f7-0bc180cf74b4
+        name:
+          type: string
+          example: Carrot
+        status:
+          type: string
+          enum:
+            - vegetables
+            - fruits
+            - meat
+          description: Класс товара
+        created_at:
+          type: string
+          format: date-time
+          example: 2026-04-13T17:00:00+01:00
+    Goods:
+      type: array
+      items:
+        $ref: '#/components/schemas/Good'
+    Error:
+      type: object
+      required: 
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
